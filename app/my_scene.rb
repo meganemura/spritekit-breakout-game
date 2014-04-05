@@ -37,6 +37,17 @@ class MyScene < SKScene
 
     ball.physicsBody.applyImpulse(CGVectorMake(10.0, -10.0))
 
+
+    paddle = SKSpriteNode.alloc.initWithImageNamed("paddle")
+    paddle.name = NAME_CATEGORY_PADDLE
+    paddle.position = CGPointMake(CGRectGetMidX(self.frame), paddle.frame.size.height * 0.6)
+    self.addChild(paddle)
+    paddle.physicsBody = SKPhysicsBody.bodyWithRectangleOfSize(paddle.frame.size).tap do |body|
+      body.restitution = 0.1
+      body.friction = 0.4
+      body.dynamic = false  # make physicsBody static
+    end
+
     self
   end
 
