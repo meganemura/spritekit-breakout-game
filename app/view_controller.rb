@@ -5,7 +5,7 @@ class ViewController < UIViewController
     self.view = SKView.alloc.initWithFrame(bounds)
   end
 
-  def viewDidLoad
+  def viewWillLayoutSubviews
     super
 
     # Configure the view.
