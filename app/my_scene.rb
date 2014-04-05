@@ -4,6 +4,10 @@ class MyScene < SKScene
   NAME_CATEGORY_PADDLE      = 'paddle'.freeze
   NAME_CATEGORY_BLOCK       = 'block'.freeze
   NAME_CATEGORY_BLOCK_NODE  = 'blockNode'.freeze
+  CATEGORY_BALL   = 0x1 << 0
+  CATEGORY_BOTTOM = 0x1 << 1
+  CATEGORY_BLOCK  = 0x1 << 2
+  CATEGORY_PADDLE = 0x1 << 3
 
   def initWithSize(size)
     super
@@ -13,6 +17,7 @@ class MyScene < SKScene
     self.addChild(background)
 
     self.physicsWorld.gravity = CGVectorMake(0.0, 0.0)
+    self.physicsWorld.contactDelegate = self
 
     # 1. Create a physics body that borders the screen
     border_body = SKPhysicsBody.bodyWithEdgeLoopFromRect(self.frame)
@@ -47,6 +52,18 @@ class MyScene < SKScene
       body.friction = 0.4
       body.dynamic = false  # make physicsBody static
     end
+
+
+    bottom_rect = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, 1)
+    bottom = SKNode.node
+    bottom.physicsBody = SKPhysicsBody.bodyWithEdgeLoopFromRect(bottom_rect)
+    self.addChild(bottom)
+
+    bottom.physicsBody.categoryBitMask  = CATEGORY_BOTTOM
+    ball.physicsBody.categoryBitMask    = CATEGORY_BALL
+    paddle.physicsBody.categoryBitMask  = CATEGORY_PADDLE
+
+    ball.physicsBody.contactTestBitMask = CATEGORY_BOTTOM
 
     self
   end
@@ -84,6 +101,23 @@ class MyScene < SKScene
 
   def touchesEnded(touches, withEvent: event)
     @is_finger_on_paddle = false
+  end
+
+  def didBeginContact(contact)
+    # 2 Assign the two physics bodies so that the one with the lower category is always stored in first_body
+    if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask
+      first_body  = contact.bodyA
+      second_body = contact.bodyB
+    else
+      first_body  = contact.bodyB
+      second_body = contact.bodyA
+    end
+
+    # 3 react to the contact between ball and bottom
+    if first_body.categoryBitMask == CATEGORY_BALL && second_body.categoryBitMask == CATEGORY_BOTTOM
+      # TODO: Replace the log statement with display of Game Over Scene
+      puts "Hit bottom. First contact has been made."
+    end
   end
 
   def update(current_time)
