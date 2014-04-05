@@ -5,6 +5,8 @@ class MyScene < SKScene
   NAME_CATEGORY_BLOCK       = 'block'.freeze
   NAME_CATEGORY_BLOCK_NODE  = 'blockNode'.freeze
 
+  attr_accessor :is_finger_on_paddle
+
   def initWithSize(size)
     super
 
@@ -49,6 +51,41 @@ class MyScene < SKScene
     end
 
     self
+  end
+
+  def touchesBegan(touches, withEvent: event)
+    # Called when a touch begins
+    touch = touches.anyObject
+    touch_location = touch.locationInNode(self)
+
+    body = self.physicsWorld.bodyAtPoint(touch_location)
+    if body && body.node.name == NAME_CATEGORY_PADDLE
+      puts "Began touch on paddle"
+      is_finger_on_paddle = true
+    end
+  end
+
+  def touchesMoved(touches, withEvent: event)
+    # 1 Check whether user tapped paddle
+    return unless is_finger_on_paddle
+
+    # 2 Get touch location
+    touch = touches.anyObject
+    touch_location = touch.locationInNode(self)
+    previous_location = touch.previousLocationInNode(self)
+    # 3 Get node for paddle
+    paddle = self.childNodeWithName(NAME_CATEGORY_PADDLE)
+    # 4 Calculate new position along x for paddle
+    paddle_x = paddle.position.x + (touch_location.x - previous_location.x)
+    # 5 Limit x so that the paddle will not leave the screen to left or right
+    paddle_x = [paddle_x, paddle.size.width / 2].max
+    paddle_x = [paddle_x, self.size.width - paddle.size.width / 2].min
+    # 6 Update position of paddle
+    paddle.position = CGPointMake(paddle_x, paddle.position.y)
+  end
+
+  def touchesEnded(touches, withEvent: event)
+    is_finger_on_paddle = false
   end
 
   def update(current_time)
