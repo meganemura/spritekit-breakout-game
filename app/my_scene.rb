@@ -5,8 +5,6 @@ class MyScene < SKScene
   NAME_CATEGORY_BLOCK       = 'block'.freeze
   NAME_CATEGORY_BLOCK_NODE  = 'blockNode'.freeze
 
-  attr_accessor :is_finger_on_paddle
-
   def initWithSize(size)
     super
 
@@ -61,13 +59,13 @@ class MyScene < SKScene
     body = self.physicsWorld.bodyAtPoint(touch_location)
     if body && body.node.name == NAME_CATEGORY_PADDLE
       puts "Began touch on paddle"
-      is_finger_on_paddle = true
+      @is_finger_on_paddle = true
     end
   end
 
   def touchesMoved(touches, withEvent: event)
     # 1 Check whether user tapped paddle
-    return unless is_finger_on_paddle
+    return unless @is_finger_on_paddle
 
     # 2 Get touch location
     touch = touches.anyObject
@@ -85,7 +83,7 @@ class MyScene < SKScene
   end
 
   def touchesEnded(touches, withEvent: event)
-    is_finger_on_paddle = false
+    @is_finger_on_paddle = false
   end
 
   def update(current_time)
