@@ -115,8 +115,8 @@ class MyScene < SKScene
 
     # 3 react to the contact between ball and bottom
     if first_body.categoryBitMask == CATEGORY_BALL && second_body.categoryBitMask == CATEGORY_BOTTOM
-      # TODO: Replace the log statement with display of Game Over Scene
-      puts "Hit bottom. First contact has been made."
+      game_over_scene = GameOverScene.alloc.initWithSize(self.frame.size, player_won: false)
+      self.view.presentScene(game_over_scene) if self.view  # FIXME self.view becomes nil unexpectedly
     end
   end
 
